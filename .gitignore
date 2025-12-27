@@ -1,0 +1,17 @@
+# Flutter / Dart
+/build/
+.dart_tool/
+.packages
+
+# Android
+android/.gradle/
+android/app/build/
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+
+# Windows
+windows/build/

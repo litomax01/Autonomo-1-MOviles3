@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "660515093784",
+    "firebase_url": "https://debermoviles3-default-rtdb.firebaseio.com",
+    "project_id": "debermoviles3",
+    "storage_bucket": "debermoviles3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:660515093784:android:c71bede335829e2f17326d",
+        "android_client_info": {
+          "package_name": "com.example.app_crud"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_VbRrmSgZ_RmzOGCk1cKooWG7gTh6b8E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
