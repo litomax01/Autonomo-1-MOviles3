@@ -93,7 +93,7 @@ Widget lista(BuildContext context) {
 
                   Text("Código: ${item['codigo']}"),
                   Text("Precio: \$${item['precio']}"),
-                  Text("Stock: ${item['cantidad']}"),
+                  Text("Cantidad: ${item['cantidad']}"),
 
                   const SizedBox(height: 6),
 
@@ -210,7 +210,7 @@ void editar(BuildContext context, Map item) {
           ),
           onPressed: () async {
             await FirebaseDatabase.instance
-                .ref("producto/${item['key']}")
+                .ref("servicio/${item['key']}") // ✅ CORREGIDO AQUÍ
                 .update({
               "nombre": nombre.text.trim(),
               "precio": precio.text.trim(),
@@ -232,27 +232,28 @@ void eliminar(BuildContext context, Map item) {
   showDialog(
     context: context,
     builder: (_) => AlertDialog(
-      title: const Text("Eliminar"),
-      content: const Text("¿Deseas eliminar este servicio?"),
+      title: const Text("Eliminar servicio"),
+      content: const Text("¿Estás seguro de eliminar este servicio?"),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text("No"),
+          child: const Text("Cancelar"),
         ),
         FilledButton(
           style: FilledButton.styleFrom(
             backgroundColor: Colors.red[400],
-            foregroundColor: Colors.white,
+            foregroundColor: Colors.black,
           ),
           onPressed: () async {
             await FirebaseDatabase.instance
                 .ref("servicio/${item['key']}")
                 .remove();
+
             Navigator.pop(context);
           },
-          child: const Text("Sí"),
+          child: const Text("Eliminar"),
         ),
       ],
     ),
   );
-}
+} 
