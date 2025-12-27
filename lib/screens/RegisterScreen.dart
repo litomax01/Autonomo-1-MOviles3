@@ -1,112 +1,131 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
- 
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController correoController = TextEditingController();
+  final TextEditingController contraseniaController = TextEditingController();
+
+  @override
+  void dispose() {
+    correoController.dispose();
+    contraseniaController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Registro")),
-      body: formulario(context),
+      backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        title: const Text("Registro"),
+        backgroundColor: Colors.amber[700],
+        foregroundColor: Colors.black,
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Crear nueva cuenta",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                TextField(
+                  controller: correoController,
+                  decoration: const InputDecoration(
+                    labelText: "Correo electrónico",
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                TextField(
+                  controller: contraseniaController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: "Contraseña",
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.amber[700],
+                    foregroundColor: Colors.black,
+                  ),
+                  onPressed: registrar,
+                  child: const Text("Registrar"),
+                ),
+                const SizedBox(height: 12),
+
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Volver al login"),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
-}
- 
-Widget formulario(context) {
-  TextEditingController nombre = TextEditingController();
-  TextEditingController apellido = TextEditingController();
-  TextEditingController edad = TextEditingController();
-  TextEditingController correo = TextEditingController();
-  TextEditingController contrasenia = TextEditingController();
- 
-  return Column(
-    children: [
-      TextField(
-        controller: nombre,
-        decoration: InputDecoration(label: Text("Ingresar nombre")),
-      ),
-      TextField(
-        controller: apellido,
-        decoration: InputDecoration(label: Text("Ingresar apellido")),
-      ),
-      TextField(
-        controller: edad,
-        decoration: InputDecoration(label: Text("Ingresar edad")),
-      ),
-      TextField(
-        controller: correo,
-        decoration: InputDecoration(label: Text("Ingresar correo")),
-      ),
- 
-      TextField(
-        controller: contrasenia,
-        obscureText: true,
-        decoration: InputDecoration(label: Text("Ingresar contrasenia")),
-      ),
- 
-      FilledButton(
-        onPressed: () =>
-            registro(context, nombre, apellido, edad, correo, contrasenia),
-        child: Text("Registro"),
-      ),
-    ],
-  );
-}
- 
-Future<void> registro(
-  context,
-  nombre,
-  apellido,
-  edad,
-  correo,
-  contrasenia,
-) async {
-  try {
-    // 1. Creamos el usuario
-    UserCredential userCredential = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(
-          email: correo.text.trim(),
-          password: contrasenia.text.trim(),
-        );
- 
-    String uid = userCredential.user!.uid;
- 
-    // 2. Guardamos datos
-    DatabaseReference ref = FirebaseDatabase.instance.ref("usuarios/$uid");
-    await ref.set({
-      "nombre": nombre.text,
-      "apellido": apellido.text,
-      "edad": edad.text,
-      "correo": correo.text,
-    });
- 
-    // 3. CERRAR SESIÓN para que no entre directo
-    await FirebaseAuth.instance.signOut();
- 
-    // 4. Mostrar el diálogo (Simplemente borra el if(!context.mounted))
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Registro Exitoso"),
-          content: const Text("Ahora inicia sesión con tu cuenta."),
+
+  Future<void> registrar() async {
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: correoController.text.trim(),
+        password: contraseniaController.text,
+      );
+
+      // ✅ Mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Usuario registrado correctamente"),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // ⏳ Espera breve y vuelve al login
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pop(context);
+      });
+    } on FirebaseAuthException catch (e) {
+      String mensaje = "Error al registrar";
+
+      if (e.code == 'email-already-in-use') {
+        mensaje = 'El correo ya está registrado';
+      } else if (e.code == 'invalid-email') {
+        mensaje = 'Correo inválido';
+      } else if (e.code == 'weak-password') {
+        mensaje = 'Contraseña muy débil';
+      }
+
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Error"),
+          content: Text(mensaje),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(context, "/login");
-                Navigator.pop(context, "/login");
-              },
-              child: const Text("IR AL LOGIN"),
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Aceptar"),
             ),
           ],
-        );
-      },
-    );
-  } catch (e) {
-    print("Error: $e");
+        ),
+      );
+    }
   }
 }
- 

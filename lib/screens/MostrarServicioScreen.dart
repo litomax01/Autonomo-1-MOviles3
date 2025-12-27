@@ -1,43 +1,45 @@
-import 'package:firebase_auth/firebase_auth.dart'; 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class MostrarservicioScreen extends StatelessWidget {
   const MostrarservicioScreen({super.key});
- 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Mostrar Servicio"), centerTitle: true),
-      body: lista(),
+      backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        title: const Text("Mis servicios"),
+        backgroundColor: Colors.amber[700],
+        foregroundColor: Colors.black,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8),
+        child: lista(context),
+      ),
     );
   }
 }
- 
 
-Widget lista() {
- 
+Widget lista(BuildContext context) {
   final String uidActual = FirebaseAuth.instance.currentUser!.uid;
- 
+  DatabaseReference ref = FirebaseDatabase.instance.ref('servicio');
 
-  DatabaseReference ref = FirebaseDatabase.instance.ref('producto');
- 
   return StreamBuilder<DatabaseEvent>(
     stream: ref.onValue,
     builder: (context, snapshot) {
       if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
-        return const Center(child: Text("NO HAY DATA"));
+        return const Center(child: Text("No hay servicios"));
       }
- 
+
       final Map data = snapshot.data!.snapshot.value as Map;
- 
-      final List productos = [];
- 
+      final List servicios = [];
+
       data.forEach((key, value) {
-      
         if (value['uidUsuario'] == uidActual) {
-          productos.add({
-            'key': key, // ID  DE FIREBASE
+          servicios.add({
+            'key': key,
             'codigo': value['codigo'],
             'nombre': value['nombre'],
             'precio': value['precio'],
@@ -47,44 +49,73 @@ Widget lista() {
           });
         }
       });
- 
-      if (productos.isEmpty) {
-        return const Center(child: Text("No tienes productos registrados"));
+
+      if (servicios.isEmpty) {
+        return const Center(child: Text("No tienes servicios registrados"));
       }
- 
+
       return ListView.builder(
-        itemCount: productos.length,
+        itemCount: servicios.length,
         itemBuilder: (context, index) {
-          final item = productos[index];
- 
+          final item = servicios[index];
+
           return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: ListTile(
-              leading: Image.network(
-                item['imagen'],
-                width: 55,
-                height: 55,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    const Icon(Icons.image_not_supported),
-              ),
-              title: Text(item['nombre']),
-              subtitle: Text(
-                // CAMBIO CLAVE #3:
-                // - Mostramos el código REAL del producto
-                "Código: ${item['codigo']} | Precio: \$${item['precio']}",
-              ),
-              onTap: () => verProducto(context, item),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
+            color: Colors.white,
+            elevation: 3,
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () => editar(context, item),
+                  Row(
+                    children: [
+                      Image.network(
+                        item['imagen'],
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            const Icon(Icons.image),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          item['nombre'],
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => eliminar(context, item),
+                  const SizedBox(height: 6),
+
+                  Text("Código: ${item['codigo']}"),
+                  Text("Precio: \$${item['precio']}"),
+                  Text("Stock: ${item['cantidad']}"),
+
+                  const SizedBox(height: 6),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        color: Colors.amber[700],
+                        icon: const Icon(Icons.visibility),
+                        onPressed: () => verServicio(context, item),
+                      ),
+                      IconButton(
+                        color: Colors.amber[700],
+                        icon: const Icon(Icons.edit),
+                        onPressed: () => editar(context, item),
+                      ),
+                      IconButton(
+                        color: Colors.red[400],
+                        icon: const Icon(Icons.delete),
+                        onPressed: () => eliminar(context, item),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -96,7 +127,7 @@ Widget lista() {
   );
 }
 
-void verProducto(BuildContext context, Map item) {
+void verServicio(BuildContext context, Map item) {
   showDialog(
     context: context,
     builder: (_) => AlertDialog(
@@ -106,8 +137,8 @@ void verProducto(BuildContext context, Map item) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("Código: ${item['codigo']}"),
-            Text("Precio: \$ ${item['precio']}"),
-            Text("Stock: ${item['cantidad']}"),
+            Text("Precio: \$${item['precio']}"),
+            Text("Cantidad: ${item['cantidad']}"),
             const SizedBox(height: 8),
             Text(item['descripcion']),
             const SizedBox(height: 10),
@@ -118,6 +149,12 @@ void verProducto(BuildContext context, Map item) {
           ],
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Cerrar"),
+        ),
+      ],
     ),
   );
 }
@@ -128,11 +165,11 @@ void editar(BuildContext context, Map item) {
   final cantidad = TextEditingController(text: item['cantidad'].toString());
   final descripcion = TextEditingController(text: item['descripcion']);
   final imagen = TextEditingController(text: item['imagen']);
- 
+
   showDialog(
     context: context,
     builder: (_) => AlertDialog(
-      title: const Text("Editar Producto"),
+      title: const Text("Editar servicio"),
       content: SingleChildScrollView(
         child: Column(
           children: [
@@ -164,54 +201,58 @@ void editar(BuildContext context, Map item) {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text("CANCELAR"),
+          child: const Text("Cancelar"),
         ),
         FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: Colors.amber[700],
+            foregroundColor: Colors.black,
+          ),
           onPressed: () async {
             await FirebaseDatabase.instance
-                // 🔑 AQUÍ ESTÁ EL CAMBIO IMPORTANTE
                 .ref("producto/${item['key']}")
                 .update({
-                  "nombre": nombre.text,
-                  "precio": precio.text,
-                  "cantidad": cantidad.text,
-                  "descripcion": descripcion.text,
-                  "imagen": imagen.text,
-                });
- 
+              "nombre": nombre.text.trim(),
+              "precio": precio.text.trim(),
+              "cantidad": cantidad.text.trim(),
+              "descripcion": descripcion.text.trim(),
+              "imagen": imagen.text.trim(),
+            });
+
             Navigator.pop(context);
           },
-          child: const Text("GUARDAR"),
+          child: const Text("Guardar"),
         ),
       ],
     ),
   );
 }
- 
+
 void eliminar(BuildContext context, Map item) {
   showDialog(
     context: context,
     builder: (_) => AlertDialog(
-      title: const Text("¿Eliminar producto?"),
-      content: Text("Eliminar ${item['nombre']}"),
+      title: const Text("Eliminar"),
+      content: const Text("¿Deseas eliminar este servicio?"),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text("NO"),
+          child: const Text("No"),
         ),
-        TextButton(
+        FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: Colors.red[400],
+            foregroundColor: Colors.white,
+          ),
           onPressed: () async {
             await FirebaseDatabase.instance
-                // 🔑 ID REAL DE FIREBASE
-                .ref("producto/${item['key']}")
+                .ref("servicio/${item['key']}")
                 .remove();
- 
             Navigator.pop(context);
           },
-          child: const Text("SÍ"),
+          child: const Text("Sí"),
         ),
       ],
     ),
   );
 }
- 

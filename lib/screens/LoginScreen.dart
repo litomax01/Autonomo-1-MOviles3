@@ -22,38 +22,66 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: correoController,
-              decoration: const InputDecoration(
-                labelText: "Ingresar correo",
-              ),
+      backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        title: const Text("Login"),
+        backgroundColor: Colors.amber[700],
+        foregroundColor: Colors.black,
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Ingreso al sistema",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                TextField(
+                  controller: correoController,
+                  decoration: const InputDecoration(
+                    labelText: "Correo",
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                TextField(
+                  controller: contraseniaController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: "Contraseña",
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.amber[700],
+                    foregroundColor: Colors.black,
+                  ),
+                  onPressed: login,
+                  child: const Text("Ingresar"),
+                ),
+                const SizedBox(height: 12),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.amber[300],
+                    foregroundColor: Colors.black,
+                  ),
+                  onPressed: () =>
+                      Navigator.pushNamed(context, "/register"),
+                  child: const Text("Crear cuenta"),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: contraseniaController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: "Ingresar contraseña",
-              ),
-            ),
-            const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: login,
-              icon: const Icon(Icons.login),
-              label: const Text("Ingresar"),
-            ),
-            const SizedBox(height: 12),
-            FilledButton.icon(
-              onPressed: () => Navigator.pushNamed(context, "/registro"),
-              icon: const Icon(Icons.person_add),
-              label: const Text("Regístrate"),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -66,21 +94,19 @@ class _LoginScreenState extends State<LoginScreen> {
         password: contraseniaController.text,
       );
     } on FirebaseAuthException catch (e) {
-      String mensaje = "Ocurrió un error inesperado";
+      String mensaje = "Error al iniciar sesión";
 
       if (e.code == 'user-not-found' ||
           e.code == 'invalid-credential') {
-        mensaje = 'El correo o la contraseña no son correctos.';
-      } else if (e.code == 'wrong-password') {
-        mensaje = 'Contraseña incorrecta.';
+        mensaje = 'Correo o contraseña incorrectos';
       } else if (e.code == 'invalid-email') {
-        mensaje = 'El formato del correo es inválido.';
+        mensaje = 'Correo inválido';
       }
 
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          title: const Text("Error de inicio de sesión"),
+          title: const Text("Error"),
           content: Text(mensaje),
           actions: [
             TextButton(
