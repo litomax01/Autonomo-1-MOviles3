@@ -1,8 +1,8 @@
 
-import 'package:app_crud/screens/GuardarScreen.dart';
-import 'package:app_crud/screens/LeerScreen.dart';
+import 'package:app_crud/screens/GuardarServicioScreen.dart';
+import 'package:app_crud/screens/MostrarServicioScreen.dart';
 import 'package:app_crud/screens/LoginScreen.dart';
-import 'package:app_crud/screens/RegistroScreen.dart';
+import 'package:app_crud/screens/RegisterScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -21,12 +21,12 @@ class MiAplicacion extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      //rutas
+      
       routes: {
         "/login": (context) => LoginScreen(),
-        "/registro": (context) => RegistroScreen(),
-        "/guardarProducto": (context) => GuardarScreen(),
-        "/leerProducto": (context) => LeerScreen(),
+        "/register": (context) => RegisterScreen(),
+        "/guardarServicio": (context) => GuardarServicioScreen(),
+        "/mostrarServicio": (context) => MostrarservicioScreen(),
       },
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
@@ -54,24 +54,21 @@ class Cuerpo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Productos"),
+        title: Text("Servicios"),
         actions: [
-          // Botón para cerrar sesión
-          IconButton(
-            onPressed: () => FirebaseAuth.instance.signOut(),
-            icon: const Icon(Icons.exit_to_app),
-          ),
-        ],
+          FilledButton(onPressed: () => FirebaseAuth.instance.signOut(), child:Text("Salir"))
+          
+        ]
       ),
       body: Column(
         children: [
           FilledButton(
-            onPressed: () => Navigator.pushNamed(context, "/leerProducto"),
-            child: Text("Leer Producto"),
+            onPressed: () => Navigator.pushNamed(context, "/mostrarServicio"),
+            child: Text("Mostrar Servicio"),
           ),
           FilledButton(
-            onPressed: () => Navigator.pushNamed(context, "/guardarProducto"),
-            child: Text("Guardar Producto"),
+            onPressed: () => Navigator.pushNamed(context, "/guardarServicio"),
+            child: Text("Guardar Servicio"),
           ),
         ],
       ),

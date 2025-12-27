@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
- 
-class RegistroScreen extends StatelessWidget {
-  const RegistroScreen({super.key});
+
+class RegisterScreen extends StatelessWidget {
+  const RegisterScreen({super.key});
  
   @override
   Widget build(BuildContext context) {

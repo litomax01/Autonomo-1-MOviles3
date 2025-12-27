@@ -1,27 +1,25 @@
-import 'package:firebase_auth/firebase_auth.dart'; // 🔐 PARA OBTENER EL UID
+import 'package:firebase_auth/firebase_auth.dart'; 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
- 
-class LeerScreen extends StatelessWidget {
-  const LeerScreen({super.key});
+
+class MostrarservicioScreen extends StatelessWidget {
+  const MostrarservicioScreen({super.key});
  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Leer Producto"), centerTitle: true),
+      appBar: AppBar(title: const Text("Mostrar Servicio"), centerTitle: true),
       body: lista(),
     );
   }
 }
  
-// =======================================================
-// LISTA DE PRODUCTOS
-// =======================================================
+
 Widget lista() {
-  // UID DEL USUARIO ACTUAL
+ 
   final String uidActual = FirebaseAuth.instance.currentUser!.uid;
  
-  // 📡 Referencia a la tabla producto
+
   DatabaseReference ref = FirebaseDatabase.instance.ref('producto');
  
   return StreamBuilder<DatabaseEvent>(
@@ -36,9 +34,7 @@ Widget lista() {
       final List productos = [];
  
       data.forEach((key, value) {
-        // =======================================================
-        // se agregan productos
-        // =======================================================
+      
         if (value['uidUsuario'] == uidActual) {
           productos.add({
             'key': key, // ID  DE FIREBASE
@@ -99,10 +95,7 @@ Widget lista() {
     },
   );
 }
- 
-// =======================================================
-// VER PRODUCTO
-// =======================================================
+
 void verProducto(BuildContext context, Map item) {
   showDialog(
     context: context,
@@ -128,10 +121,7 @@ void verProducto(BuildContext context, Map item) {
     ),
   );
 }
- 
-// =======================================================
-// EDITAR PRODUCTO
-// =======================================================
+
 void editar(BuildContext context, Map item) {
   final nombre = TextEditingController(text: item['nombre']);
   final precio = TextEditingController(text: item['precio'].toString());
@@ -198,9 +188,6 @@ void editar(BuildContext context, Map item) {
   );
 }
  
-// =======================================================
-// ELIMINAR PRODUCTO
-// =======================================================
 void eliminar(BuildContext context, Map item) {
   showDialog(
     context: context,

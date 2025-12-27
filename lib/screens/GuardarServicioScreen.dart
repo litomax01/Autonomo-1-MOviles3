@@ -2,13 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
  
-class GuardarScreen extends StatelessWidget {
-  const GuardarScreen({super.key});
+class GuardarServicioScreen extends StatelessWidget {
+  const GuardarServicioScreen({super.key});
  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Guardar Producto")),
+      appBar: AppBar(title: const Text("Guardar Servicio")),
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: formulario(context),
@@ -17,9 +17,6 @@ class GuardarScreen extends StatelessWidget {
   }
 }
  
-// ==========================
-// FORMULARIO
-// ==========================
 Widget formulario(BuildContext context) {
   final TextEditingController codigo = TextEditingController();
   final TextEditingController nombre = TextEditingController();
@@ -75,9 +72,6 @@ Widget formulario(BuildContext context) {
   );
 }
  
-// ==========================
-// GUARDAR PRODUCTO CON UID
-// ==========================
 Future<void> guardarProducto(
   BuildContext context,
   TextEditingController codigo,
